@@ -1,0 +1,2287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: white;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 2rem;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            color: #2563eb;
+        }
+
+        nav {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        button, .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #64748b;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-success {
+            background: #059669;
+            color: white;
+        }
+
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .auth-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin: 2rem auto;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h3 {
+            margin-bottom: 1rem;
+            color: #2563eb;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        tr:hover {
+            background: #f8fafc;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-failed {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #64748b;
+        }
+
+        .pagination {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            justify-content: center;
+        }
+
+        .page-btn {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            background: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .page-btn.active {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+
+        .json-view {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            overflow-x: auto;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .user-info {
+            background: #e0f2fe;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+
+        .requirements-list {
+            list-style: none;
+        }
+
+        .requirements-list li {
+            padding: 0.5rem;
+            background: #f8fafc;
+            margin-bottom: 0.5rem;
+            border-radius: 4px;
+            border-left: 3px solid #2563eb;
+        }
+
+        .message-bubble {
+            background: #f0f9ff;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid #e0f2fe;
+        }
+
+        .message-bubble.sent {
+            background: #f0f9ff;
+            margin-left: 2rem;
+        }
+
+        .message-bubble.received {
+            background: #f1f5f9;
+            margin-right: 2rem;
+        }
+
+        .timestamp {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav {
+                justify-content: center;
+            }
+
+            .modal-content {
+                margin: 10% auto;
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="container header-content">
+        <h1>Task Management System</h1>
+        <nav id="main-nav"></nav>
+    </div>
+</header>
+
+<div class="container">
+    <!-- Login Section -->
+    <div id="login-section" class="auth-section">
+        <h2>Login</h2>
+        <div class="form-group">
+            <label>Login Type:</label>
+            <select id="login-type" onchange="toggleLoginForm()">
+                <option value="user">User</option>
+                <option value="manager">Manager</option>
+            </select>
+        </div>
+
+        <div id="user-login-form">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" placeholder="Enter username">
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" placeholder="Enter password">
+            </div>
+            <button onclick="login()" class="btn-primary">Login as User</button>
+        </div>
+
+        <div id="manager-login-form" class="hidden">
+            <div class="form-group">
+                <label for="manager-username">Manager Username:</label>
+                <input type="text" id="manager-username" placeholder="Enter manager username">
+            </div>
+            <div class="form-group">
+                <label for="manager-password">Password:</label>
+                <input type="password" id="manager-password" placeholder="Enter manager password">
+            </div>
+            <button onclick="managerLogin()" class="btn-primary">Login as Manager</button>
+        </div>
+    </div>
+
+    <!-- Main Content Section (hidden until login) -->
+    <div id="main-content" class="hidden">
+        <!-- Alerts -->
+        <div id="alert-container"></div>
+
+        <!-- User Info -->
+        <div id="user-info" class="user-info hidden"></div>
+
+        <!-- Dashboard -->
+        <div id="dashboard" class="hidden">
+            <h2>Dashboard</h2>
+            <div class="card">
+                <h3>Quick Actions</h3>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
+                    <button onclick="showModal('create-task-modal')" class="btn-primary">Create Task</button>
+                    <button onclick="showModal('create-report-modal')" class="btn-success">Create Report</button>
+                    <button onclick="showModal('create-message-modal')" class="btn-secondary">Send Message</button>
+                    <button onclick="loadTasks()" class="btn-secondary">Refresh Tasks</button>
+                    <button onclick="loadReports()" class="btn-secondary">Refresh Reports</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Sections -->
+        <div id="tasks-section" class="hidden">
+            <h2>My Tasks</h2>
+            <div id="tasks-container"></div>
+        </div>
+
+        <div id="tasks-admin-section" class="hidden">
+            <h2>Slaves' Tasks</h2>
+            <div id="tasks-admin-container"></div>
+        </div>
+
+        <div id="reports-section" class="hidden">
+            <h2>My Reports</h2>
+            <div id="reports-container"></div>
+        </div>
+
+        <div id="reports-admin-section" class="hidden">
+            <h2>Slaves' Reports</h2>
+            <div id="reports-admin-container"></div>
+        </div>
+
+        <div id="messages-section" class="hidden">
+            <h2>Messages</h2>
+            <div id="messages-container"></div>
+        </div>
+
+        <div id="users-section" class="hidden">
+            <h2>Users Management</h2>
+            <div style="margin-bottom: 1rem;">
+                <button onclick="showModal('create-user-modal')" class="btn-primary">Create User</button>
+            </div>
+            <div id="users-container"></div>
+        </div>
+
+        <div id="slaves-section" class="hidden">
+            <h2>My Slaves</h2>
+            <div id="slaves-container"></div>
+        </div>
+
+        <div id="roles-section" class="hidden">
+            <h2>Roles Management</h2>
+            <div style="margin-bottom: 1rem;">
+                <button onclick="showModal('create-role-modal')" class="btn-primary">Create Role</button>
+            </div>
+            <div id="roles-container"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals -->
+<!-- Create Task Modal -->
+<div id="create-task-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Create Task</h3>
+            <button onclick="closeModal('create-task-modal')" class="close-modal">×</button>
+        </div>
+        <form id="create-task-form" onsubmit="createTask(event)">
+            <div class="form-group">
+                <label>Task Type:</label>
+                <select id="task-type" onchange="toggleTaskForm()">
+                    <option value="personal">Personal Task</option>
+                    <option value="admin">Assign to Slave</option>
+                </select>
+            </div>
+
+            <div id="personal-task-form">
+                <div class="form-group">
+                    <label for="task-name">Name:</label>
+                    <input type="text" id="task-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="task-description">Description:</label>
+                    <textarea id="task-description" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="task-expires">Expires At:</label>
+                    <input type="datetime-local" id="task-expires" required>
+                </div>
+            </div>
+
+            <div id="admin-task-form" class="hidden">
+                <div class="form-group">
+                    <label for="task-slave">Assign to User:</label>
+                    <select id="task-slave" required></select>
+                </div>
+                <div class="form-group">
+                    <label for="admin-task-name">Name:</label>
+                    <input type="text" id="admin-task-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="admin-task-description">Description:</label>
+                    <textarea id="admin-task-description" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="admin-task-expires">Expires At:</label>
+                    <input type="datetime-local" id="admin-task-expires" required>
+                </div>
+                <div class="form-group">
+                    <label>Requirements:</label>
+                    <div id="requirements-container">
+                        <div class="requirement-row" style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                            <input type="text" class="requirement-field" placeholder="Field name" style="flex: 1;">
+                            <input type="text" class="requirement-value" placeholder="Value" style="flex: 1;">
+                            <button type="button" onclick="removeRequirementRow(this)" class="btn-danger">×</button>
+                        </div>
+                    </div>
+                    <button type="button" onclick="addRequirementRow()" class="btn-secondary"
+                            style="margin-top: 0.5rem;">Add Requirement
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary">Create Task</button>
+        </form>
+    </div>
+</div>
+
+<!-- Create Report Modal -->
+<div id="create-report-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Create Report</h3>
+            <button onclick="closeModal('create-report-modal')" class="close-modal">×</button>
+        </div>
+        <form onsubmit="createReport(event)">
+            <div class="form-group">
+                <label for="report-content">Content:</label>
+                <textarea id="report-content" required></textarea>
+            </div>
+            <button type="submit" class="btn-success">Create Report</button>
+        </form>
+    </div>
+</div>
+
+<!-- Create Message Modal -->
+<div id="create-message-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Send Message</h3>
+            <button onclick="closeModal('create-message-modal')" class="close-modal">×</button>
+        </div>
+        <form onsubmit="createMessage(event)">
+            <div class="form-group">
+                <label for="message-receiver">To:</label>
+                <select id="message-receiver" required></select>
+            </div>
+            <div class="form-group">
+                <label for="message-content">Content:</label>
+                <textarea id="message-content" required></textarea>
+            </div>
+            <button type="submit" class="btn-secondary">Send Message</button>
+        </form>
+    </div>
+</div>
+
+<!-- Create User Modal (Manager only) -->
+<div id="create-user-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Create User</h3>
+            <button onclick="closeModal('create-user-modal')" class="close-modal">×</button>
+        </div>
+        <form onsubmit="createUser(event)">
+            <div class="form-group">
+                <label for="user-name">Username:</label>
+                <input type="text" id="user-name" required>
+            </div>
+            <div class="form-group">
+                <label for="user-password">Password:</label>
+                <input type="password" id="user-password" required>
+            </div>
+            <div class="form-group">
+                <label for="user-role">Role:</label>
+                <select id="user-role" required></select>
+            </div>
+            <button type="submit" class="btn-primary">Create User</button>
+        </form>
+    </div>
+</div>
+
+<!-- Create Role Modal (Manager only) -->
+<div id="create-role-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Create Role</h3>
+            <button onclick="closeModal('create-role-modal')" class="close-modal">×</button>
+        </div>
+        <form onsubmit="createRole(event)">
+            <div class="form-group">
+                <label for="role-title">Title:</label>
+                <input type="text" id="role-title" required>
+            </div>
+            <div class="form-group">
+                <label for="role-abilities">Abilities (comma-separated):</label>
+                <input type="text" id="role-abilities" placeholder="task-index, task-create, *" required>
+            </div>
+            <div class="form-group">
+                <label for="role-master">Master Role:</label>
+                <select id="role-master">
+                    <option value="">None (Top Level)</option>
+                </select>
+            </div>
+            <button type="submit" class="btn-primary">Create Role</button>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div id="edit-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="edit-modal-title">Edit</h3>
+            <button onclick="closeModal('edit-modal')" class="close-modal">×</button>
+        </div>
+        <form id="edit-form" onsubmit="handleEdit(event)"></form>
+    </div>
+</div>
+
+<!-- Detail Modal -->
+<div id="detail-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="detail-modal-title">Details</h3>
+            <button onclick="closeModal('detail-modal')" class="close-modal">×</button>
+        </div>
+        <div id="detail-content" class="json-view"></div>
+    </div>
+</div>
+
+<script>
+    // Configuration
+    const API_BASE = 'http://localhost:8000/api';
+    let currentUser = null;
+    let currentToken = null;
+    let userType = null;
+    let currentPage = 1;
+    let currentLimit = 10;
+
+    // DOM Elements
+    const elements = {
+        loginSection: document.getElementById('login-section'),
+        mainContent: document.getElementById('main-content'),
+        dashboard: document.getElementById('dashboard'),
+        mainNav: document.getElementById('main-nav'),
+        alertContainer: document.getElementById('alert-container'),
+        userInfo: document.getElementById('user-info'),
+        tasksSection: document.getElementById('tasks-section'),
+        tasksAdminSection: document.getElementById('tasks-admin-section'),
+        reportsSection: document.getElementById('reports-section'),
+        reportsAdminSection: document.getElementById('reports-admin-section'),
+        messagesSection: document.getElementById('messages-section'),
+        usersSection: document.getElementById('users-section'),
+        slavesSection: document.getElementById('slaves-section'),
+        rolesSection: document.getElementById('roles-section')
+    };
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+        checkAuth();
+    });
+
+    // Auth Functions
+    function checkAuth() {
+        const token = localStorage.getItem('token');
+        const type = localStorage.getItem('userType');
+
+        if (token && type) {
+            currentToken = token;
+            userType = type;
+            showMainContent();
+        }
+    }
+
+    function toggleLoginForm() {
+        const type = document.getElementById('login-type').value;
+        document.getElementById('user-login-form').classList.toggle('hidden', type !== 'user');
+        document.getElementById('manager-login-form').classList.toggle('hidden', type !== 'manager');
+    }
+
+    async function login() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        try {
+            const response = await fetch(`${API_BASE}/user-login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({name: username, password})
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                currentToken = data.token;
+                userType = 'user';
+                localStorage.setItem('token', currentToken);
+                localStorage.setItem('userType', userType);
+                showMainContent();
+                showAlert('Login successful!', 'success');
+                localStorage.setItem('username', username);
+                loadCurrentUser();
+            } else {
+                showAlert(data.message || 'Login failed', 'error');
+            }
+        } catch (error) {
+            showAlert('Network error: ' + error.message, 'error');
+        }
+    }
+
+    async function managerLogin() {
+        const username = document.getElementById('manager-username').value;
+        const password = document.getElementById('manager-password').value;
+
+        try {
+            const response = await fetch(`${API_BASE}/manager-login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({name: username, password})
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                currentToken = data.token;
+                userType = 'manager';
+                localStorage.setItem('token', currentToken);
+                localStorage.setItem('userType', userType);
+                showMainContent();
+                showAlert('Manager login successful!', 'success');
+                localStorage.setItem('username', username);
+                loadCurrentUser();
+            } else {
+                showAlert(data.message || 'Login failed', 'error');
+            }
+        } catch (error) {
+            showAlert('Network error: ' + error.message, 'error');
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem('token');
+        localStorage.removeItem('userType');
+        currentToken = null;
+        userType = null;
+        currentUser = null;
+
+        elements.loginSection.classList.remove('hidden');
+        elements.mainContent.classList.add('hidden');
+        showAlert('Logged out successfully', 'success');
+    }
+
+    function showMainContent() {
+        elements.loginSection.classList.add('hidden');
+        elements.mainContent.classList.remove('hidden');
+
+        // Hide ALL sections first
+        Object.keys(elements).forEach(key => {
+            if (key.endsWith('Section') || key === 'dashboard') {
+                elements[key].classList.add('hidden');
+            }
+        });
+
+        updateNavigation();
+        loadCurrentUser();
+
+        // Show appropriate initial section based on user type
+        if (userType === 'user') {
+            elements.dashboard.classList.remove('hidden');
+            buildUserDashboard();
+        } else if (userType === 'manager') {
+            elements.usersSection.classList.remove('hidden');
+            loadUsers();
+        }
+    }
+
+    function updateNavigation() {
+        elements.mainNav.innerHTML = '';
+
+        const navItems = [];
+
+        if (userType === 'user') {
+            navItems.push({id: 'dashboard', text: 'Dashboard', onClick: () => showSection('dashboard')});
+            navItems.push(
+                {
+                    id: 'tasks', text: 'My Tasks', onClick: () => {
+                        showSection('tasks');
+                        loadTasks();
+                    }
+                },
+                {
+                    id: 'messages', text: 'Messages', onClick: () => {
+                        showSection('messages');
+                        loadMessages();
+                    }
+                },
+                {
+                    id: 'reports', text: 'My Reports', onClick: () => {
+                        showSection('reports');
+                        loadReports();
+                    }
+                },
+                {
+                    id: 'slaves', text: 'My Slaves', onClick: () => {
+                        showSection('slaves');
+                        loadSlaves();
+                    }
+                },
+                {
+                    id: 'tasks-admin', text: "Slaves' Tasks", onClick: () => {
+                        showSection('tasks-admin');
+                        loadTasksAdmin();
+                    }
+                },
+                {
+                    id: 'reports-admin', text: "Slaves' Reports", onClick: () => {
+                        showSection('reports-admin');
+                        loadReportsAdmin();
+                    }
+                }
+            );
+        } else if (userType === 'manager') {
+            navItems.push(
+                {
+                    id: 'users', text: 'Users', onClick: () => {
+                        showSection('users');
+                        loadUsers();
+                    }
+                },
+                {
+                    id: 'roles', text: 'Roles', onClick: () => {
+                        showSection('roles');
+                        loadRoles();
+                    }
+                }
+            );
+        }
+
+        navItems.forEach(item => {
+            const button = document.createElement('button');
+            button.textContent = item.text;
+            button.className = 'btn-secondary';
+            button.onclick = item.onClick;
+            elements.mainNav.appendChild(button);
+        });
+
+        const logoutBtn = document.createElement('button');
+        logoutBtn.textContent = 'Logout';
+        logoutBtn.className = 'btn-danger';
+        logoutBtn.onclick = logout;
+        elements.mainNav.appendChild(logoutBtn);
+    }
+
+    function showSection(sectionId) {
+        // Hide all sections
+        Object.keys(elements).forEach(key => {
+            if (key.endsWith('Section') || key === 'dashboard') {
+                elements[key].classList.add('hidden');
+            }
+        });
+
+        // Show requested section
+        switch (sectionId) {
+            case 'dashboard':
+                if (userType === 'user') {
+                    elements.dashboard.classList.remove('hidden');
+                    buildUserDashboard();
+                }
+                break;
+            case 'tasks':
+                elements.tasksSection.classList.remove('hidden');
+                break;
+            case 'tasks-admin':
+                elements.tasksAdminSection.classList.remove('hidden');
+                break;
+            case 'reports':
+                elements.reportsSection.classList.remove('hidden');
+                break;
+            case 'reports-admin':
+                elements.reportsAdminSection.classList.remove('hidden');
+                break;
+            case 'messages':
+                elements.messagesSection.classList.remove('hidden');
+                break;
+            case 'users':
+                elements.usersSection.classList.remove('hidden');
+                break;
+            case 'slaves':
+                elements.slavesSection.classList.remove('hidden');
+                break;
+            case 'roles':
+                elements.rolesSection.classList.remove('hidden');
+                break;
+        }
+    }
+
+    // API Helper Functions
+    async function apiFetch(endpoint, options = {}) {
+        const headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            ...options.headers
+        };
+
+        if (currentToken) {
+            headers['Authorization'] = `Bearer ${currentToken}`;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE}${endpoint}`, {
+                ...options,
+                headers
+            });
+
+            if (response.status === 401) {
+                showAlert('Session expired. Please login again.', 'error');
+                logout();
+                return null;
+            }
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                showAlert(data.message || `Error: ${response.status}`, 'error');
+                return null;
+            }
+
+            return data;
+        } catch (error) {
+            showAlert('Network error: ' + error.message, 'error');
+            return null;
+        }
+    }
+
+    // Load Functions
+    async function loadUserInfo() {
+        if (userType === 'user') {
+            // Try to get user info from slaves endpoint
+            const data = await apiFetch('/slaves?page=1&limit=1');
+            if (data && data.data.length > 0) {
+                currentUser = data.data[0];
+                updateUserInfo();
+            }
+        }
+    }
+
+    function updateUserInfo() {
+        if (currentUser) {
+            elements.userInfo.innerHTML = `
+                    <strong>Logged in as:</strong> ${currentUser.name}
+                    <br><strong>Role:</strong> ${currentUser.role?.title || 'N/A'}
+                    <br><strong>Abilities:</strong> ${currentUser.role?.abilities?.join(', ') || 'N/A'}
+                `;
+            elements.userInfo.classList.remove('hidden');
+        }
+    }
+
+    async function loadTasks() {
+        const data = await apiFetch(`/tasks?page=${currentPage}&limit=${currentLimit}`);
+        if (data) {
+            displayTasks(data.data, 'tasks-container', false);
+            setupPagination(data.pagination_info, 'tasks');
+        }
+    }
+
+    async function loadTasksAdmin() {
+        const data = await apiFetch(`/tasks-admin?page=${currentPage}&limit=${currentLimit}`);
+        if (data) {
+            displayTasks(data.data, 'tasks-admin-container', true);
+            setupPagination(data.pagination_info, 'tasks-admin');
+        }
+    }
+
+    async function loadReports() {
+        const data = await apiFetch(`/reports?page=${currentPage}&limit=${currentLimit}`);
+        if (data) {
+            displayReports(data.data, 'reports-container', false);
+            setupPagination(data.pagination_info, 'reports');
+        }
+    }
+
+    async function loadReportsAdmin() {
+        const data = await apiFetch(`/reports-admin?page=${currentPage}&limit=${currentLimit}`);
+        if (data) {
+            displayReports(data.data, 'reports-admin-container', true);
+            setupPagination(data.pagination_info, 'reports-admin');
+        }
+    }
+
+    async function loadMessages() {
+        const data = await apiFetch(`/messages?page=${currentPage}&limit=${currentLimit}`);
+        if (data) {
+            displayMessages(data.data);
+            setupPagination(data.pagination_info, 'messages');
+        }
+    }
+
+    async function loadUsers() {
+        const data = await apiFetch(`/users?page=${currentPage}&limit=${currentLimit}`);
+        if (data) {
+            displayUsers(data.data);
+            setupPagination(data.pagination_info, 'users');
+        }
+    }
+
+    async function loadSlaves() {
+        const data = await apiFetch(`/slaves?page=${currentPage}&limit=${currentLimit}`);
+        if (data) {
+            displaySlaves(data.data);
+            setupPagination(data.pagination_info, 'slaves');
+        }
+    }
+
+    async function loadRoles() {
+        const data = await apiFetch(`/roles?page=${currentPage}&limit=${currentLimit}`);
+        if (data) {
+            displayRoles(data.data);
+            setupPagination(data.pagination_info, 'roles');
+        }
+    }
+
+    // Display Functions
+    function displayTasks(tasks, containerId, isAdmin = false) {
+        const container = document.getElementById(containerId);
+        if (!tasks || tasks.length === 0) {
+            container.innerHTML = '<div class="card">No tasks found</div>';
+            return;
+        }
+
+        let html = '<div class="table-container"><table>';
+        html += `
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                        <th>Expires At</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+
+        tasks.forEach(task => {
+            const statusClass = task.status === 'completed' ? 'status-completed' :
+                task.status === 'failed' ? 'status-failed' : 'status-pending';
+
+            html += `
+                    <tr>
+                        <td>${task.id}</td>
+                        <td>${task.name}</td>
+                        <td>${task.description.substring(0, 50)}${task.description.length > 50 ? '...' : ''}</td>
+                        <td><span class="status-badge ${statusClass}">${task.status}</span></td>
+                        <td>${new Date(task.expires_at).toLocaleString()}</td>
+                        <td>
+                            <button onclick="viewDetails('task${isAdmin ? '-admin' : ''}', ${task.id})" class="btn-secondary">View</button>
+                            <button onclick="showEditModal('task${isAdmin ? '-admin' : ''}', ${task.id})" class="btn-primary">Edit</button>
+                            <button onclick="deleteItem('task${isAdmin ? '-admin' : ''}', ${task.id})" class="btn-danger">Delete</button>
+                        </td>
+                    </tr>
+                `;
+        });
+
+        html += '</tbody></table></div>';
+        container.innerHTML = html;
+    }
+
+    function displayReports(reports, containerId, isAdmin = false) {
+        const container = document.getElementById(containerId);
+        if (!reports || reports.length === 0) {
+            container.innerHTML = '<div class="card">No reports found</div>';
+            return;
+        }
+
+        let html = '<div class="table-container"><table>';
+        html += `
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Content</th>
+                <th>Created At</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+    `;
+
+        reports.forEach(report => {
+            html += `
+            <tr>
+                <td>${report.id}</td>
+                <td>${report.content.substring(0, 100)}${report.content.length > 100 ? '...' : ''}</td>
+                <td>${new Date(report.created_at).toLocaleString()}</td>
+                <td>
+                    <button onclick="viewDetails('report${isAdmin ? '-admin' : ''}', ${report.id})" class="btn-secondary">View</button>
+                    ${!isAdmin ? `
+                        <button onclick="showEditModal('report${isAdmin ? '-admin' : ''}', ${report.id})" class="btn-primary">Edit</button>
+                        <button onclick="deleteItem('report${isAdmin ? '-admin' : ''}', ${report.id})" class="btn-danger">Delete</button>
+                    ` : ''}
+                </td>
+            </tr>
+        `;
+        });
+
+        html += '</tbody></table></div>';
+        container.innerHTML = html;
+    }
+
+    function displayMessages(messages) {
+        const container = document.getElementById('messages-container');
+        if (!messages || messages.length === 0) {
+            container.innerHTML = '<div class="card">No messages found</div>';
+            return;
+        }
+
+        let html = '';
+        messages.forEach(message => {
+            const isSent = message.sender_id === currentUser?.id;
+            const senderName = message.sender?.name || 'Unknown';
+            const receiverName = message.receiver?.name || 'Unknown';
+
+            html += `
+            <div class="message-bubble ${isSent ? 'sent' : 'received'}">
+                <strong>${isSent ? 'To: ' + receiverName : 'From: ' + senderName}</strong>
+                <p>${message.content}</p>
+                <div class="timestamp">${new Date(message.created_at).toLocaleString()}</div>
+                ${isSent ? `
+                    <div style="margin-top: 0.5rem;">
+                        <button onclick="viewDetails('message', ${message.id})" class="btn-secondary">View Details</button>
+                        <button onclick="showEditModal('message', ${message.id})" class="btn-primary">Edit</button>
+                        <button onclick="deleteItem('message', ${message.id})" class="btn-danger">Delete</button>
+                    </div>
+                ` : `
+                    <div style="margin-top: 0.5rem;">
+                        <button onclick="viewDetails('message', ${message.id})" class="btn-secondary">View Details</button>
+                    </div>
+                `}
+            </div>
+        `;
+        });
+
+        container.innerHTML = html;
+    }
+
+    function displayUsers(users) {
+        const container = document.getElementById('users-container');
+        if (!users || users.length === 0) {
+            container.innerHTML = '<div class="card">No users found</div>';
+            return;
+        }
+
+        let html = '<div class="table-container"><table>';
+        html += `
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Created At</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+
+        users.forEach(user => {
+            html += `
+                    <tr>
+                        <td>${user.id}</td>
+                        <td>${user.name}</td>
+                        <td>${new Date(user.created_at).toLocaleString()}</td>
+                        <td>
+                            <button onclick="viewDetails('user-admin', ${user.id})" class="btn-secondary">View</button>
+                            <button onclick="applyRoleToUser(${user.id})" class="btn-success">Apply Role</button>
+                        </td>
+                    </tr>
+                `;
+        });
+
+        html += '</tbody></table></div>';
+        container.innerHTML = html;
+    }
+
+    function displaySlaves(slaves) {
+        const container = document.getElementById('slaves-container');
+        if (!slaves || slaves.length === 0) {
+            container.innerHTML = '<div class="card">No slaves found</div>';
+            return;
+        }
+
+        let html = '<div class="table-container"><table>';
+        html += `
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Role</th>
+                        <th>Branch</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+
+        slaves.forEach(slave => {
+            html += `
+                    <tr>
+                        <td>${slave.id}</td>
+                        <td>${slave.name}</td>
+                        <td>${slave.role?.title || 'N/A'}</td>
+                        <td>${slave.role?.branch || 'N/A'}</td>
+                        <td>
+                            <button onclick="viewDetails('slave', ${slave.id})" class="btn-secondary">View</button>
+                            <button onclick="createTaskForSlave(${slave.id})" class="btn-primary">Assign Task</button>
+                        </td>
+                    </tr>
+                `;
+        });
+
+        html += '</tbody></table></div>';
+        container.innerHTML = html;
+    }
+
+    function displayRoles(roles) {
+        const container = document.getElementById('roles-container');
+        if (!roles || roles.length === 0) {
+            container.innerHTML = '<div class="card">No roles found</div>';
+            return;
+        }
+
+        let html = '<div class="table-container"><table>';
+        html += `
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Abilities</th>
+                        <th>Branch</th>
+                        <th>Depth</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+
+        roles.forEach(role => {
+            html += `
+                    <tr>
+                        <td>${role.id}</td>
+                        <td>${role.title}</td>
+                        <td>${Array.isArray(role.abilities) ? role.abilities.join(', ') : role.abilities}</td>
+                        <td>${role.branch}</td>
+                        <td>${role.depth}</td>
+                        <td>
+                            <button onclick="viewDetails('role', ${role.id})" class="btn-secondary">View</button>
+                            <button onclick="showEditModal('role', ${role.id})" class="btn-primary">Edit</button>
+                            <button onclick="deleteItem('role', ${role.id})" class="btn-danger">Delete</button>
+                        </td>
+                    </tr>
+                `;
+        });
+
+        html += '</tbody></table></div>';
+        container.innerHTML = html;
+    }
+
+    // Create Functions
+    async function createTask(event) {
+        event.preventDefault();
+
+        const isAdminTask = document.getElementById('task-type').value === 'admin';
+
+        let taskData = {};
+
+        if (isAdminTask) {
+            taskData = {
+                name: document.getElementById('admin-task-name').value,
+                description: document.getElementById('admin-task-description').value,
+                user_id: parseInt(document.getElementById('task-slave').value),
+                expires_at: document.getElementById('admin-task-expires').value.replace('T', ' ') + ':00',
+                requirements: getRequirements()
+            };
+        } else {
+            taskData = {
+                name: document.getElementById('task-name').value,
+                description: document.getElementById('task-description').value,
+                expires_at: document.getElementById('task-expires').value.replace('T', ' ') + ':00'
+            };
+        }
+
+        const endpoint = isAdminTask ? '/task-create-admin' : '/task-create';
+        const data = await apiFetch(endpoint, {
+            method: 'POST',
+            body: JSON.stringify(taskData)
+        });
+
+        if (data) {
+            showAlert('Task created successfully!', 'success');
+            closeModal('create-task-modal');
+            event.target.reset();
+
+            if (isAdminTask) {
+                loadTasksAdmin();
+            } else {
+                loadTasks();
+            }
+        }
+    }
+
+    async function createReport(event) {
+        event.preventDefault();
+
+        const content = document.getElementById('report-content').value;
+
+        const data = await apiFetch('/report-create', {
+            method: 'POST',
+            body: JSON.stringify({content})
+        });
+
+        if (data) {
+            showAlert('Report created successfully!', 'success');
+            closeModal('create-report-modal');
+            event.target.reset();
+            loadReports();
+        }
+    }
+
+    async function createMessage(event) {
+        event.preventDefault();
+
+        const receiverId = document.getElementById('message-receiver').value;
+        const content = document.getElementById('message-content').value;
+
+        const data = await apiFetch('/message-create', {
+            method: 'POST',
+            body: JSON.stringify({
+                content,
+                receiver_id: parseInt(receiverId)
+            })
+        });
+
+        if (data) {
+            showAlert('Message sent successfully!', 'success');
+            closeModal('create-message-modal');
+            event.target.reset();
+            loadMessages();
+        }
+    }
+
+    async function createUser(event) {
+        event.preventDefault();
+
+        const name = document.getElementById('user-name').value;
+        const password = document.getElementById('user-password').value;
+        const role_id = document.getElementById('user-role').value;
+
+        const data = await apiFetch('/user-create', {
+            method: 'POST',
+            body: JSON.stringify({
+                name,
+                password,
+                role_id: parseInt(role_id)
+            })
+        });
+
+        if (data) {
+            showAlert('User created successfully!', 'success');
+            closeModal('create-user-modal');
+            event.target.reset();
+            loadUsers();
+        }
+    }
+
+    async function createRole(event) {
+        event.preventDefault();
+
+        const title = document.getElementById('role-title').value;
+        const abilities = document.getElementById('role-abilities').value.split(',').map(a => a.trim());
+        const master_id = document.getElementById('role-master').value || null;
+
+        const data = await apiFetch('/role-create', {
+            method: 'POST',
+            body: JSON.stringify({
+                title,
+                abilities,
+                master_id: master_id ? parseInt(master_id) : null
+            })
+        });
+
+        if (data) {
+            showAlert('Role created successfully!', 'success');
+            closeModal('create-role-modal');
+            event.target.reset();
+            loadRoles();
+            loadRoleDropdowns(); // Refresh dropdowns
+        }
+    }
+
+    // Edit Functions
+    async function showEditModal(type, id) {
+        // Load item data first
+        let endpoint = '';
+        switch (type) {
+            case 'task':
+                endpoint = `/task/${id}`;
+                break;
+            case 'task-admin':
+                endpoint = `/task-admin/${id}`;
+                break;
+            case 'report':
+                endpoint = `/report/${id}`;
+                break;
+            case 'message':
+                endpoint = `/message/${id}`;
+                break;
+            case 'role':
+                endpoint = `/role/${id}`;
+                break;
+            default:
+                return;
+        }
+
+        const data = await apiFetch(endpoint);
+        if (!data) return;
+
+        document.getElementById('edit-modal-title').textContent = `Edit ${type}`;
+        const form = document.getElementById('edit-form');
+
+        let formHTML = '';
+
+        switch (type) {
+            case 'task':
+                if (data.status === 'completed') {
+                    formHTML = `
+            <div class="form-group">
+                <p><strong>Task Name:</strong> ${data.name}</p>
+                <p><strong>Description:</strong> ${data.description}</p>
+                <p><strong>Status:</strong> <span class="status-badge status-completed">Completed</span></p>
+                <p><em>This task is completed and cannot be modified.</em></p>
+            </div>
+        `;
+                } else {
+                    formHTML = `
+            <div class="form-group">
+                <label for="edit-status">Status:</label>
+                <select id="edit-status">
+                    <option value="pending" ${data.status === 'pending' ? 'selected' : ''}>Pending</option>
+                    <option value="completed">Completed</option>
+                </select>
+            </div>
+            <button type="submit" class="btn-primary">Update Status</button>
+            <input type="hidden" id="edit-type" value="${type}">
+            <input type="hidden" id="edit-id" value="${id}">
+        `;
+                }
+                break;
+            case 'task-admin':
+                if (data.status === 'completed') {
+                    formHTML = `
+            <div class="form-group">
+                <p><strong>Task Name:</strong> ${data.name}</p>
+                <p><strong>Description:</strong> ${data.description}</p>
+                <p><strong>Status:</strong> <span class="status-badge status-completed">Completed</span></p>
+                <p><strong>Assigned To:</strong> ${data.tasked?.name || 'Unknown'}</p>
+                <p><strong>Expires At:</strong> ${new Date(data.expires_at).toLocaleString()}</p>
+                <p><em>This task is completed and cannot be modified.</em></p>
+            </div>
+        `;
+                } else {
+                    // Store original data
+                    window.originalTaskData = data;
+                    formHTML = `
+            <div class="form-group">
+                <label for="edit-name">Name:</label>
+                <input type="text" id="edit-name" value="${data.name}">
+            </div>
+            <div class="form-group">
+                <label for="edit-description">Description:</label>
+                <textarea id="edit-description">${data.description}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="edit-status">Status:</label>
+                <select id="edit-status">
+                    <option value="pending" ${data.status === 'pending' ? 'selected' : ''}>Pending</option>
+                    <option value="completed">Completed</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="edit-expires">Expires At:</label>
+                <input type="datetime-local" id="edit-expires" value="${data.expires_at.replace(' ', 'T').substring(0, 16)}">
+            </div>
+            <div class="form-group">
+                <label>Requirements:</label>
+                <div id="edit-requirements-container">
+                    <!-- Will be populated dynamically -->
+                </div>
+                <button type="button" onclick="addEditRequirementRow()" class="btn-secondary" style="margin-top: 0.5rem;">Add Requirement</button>
+            </div>
+            <button type="submit" class="btn-primary">Update</button>
+            <input type="hidden" id="edit-type" value="${type}">
+            <input type="hidden" id="edit-id" value="${id}">
+        `;
+
+                    // Populate requirements after modal is shown
+                    setTimeout(() => {
+                        populateEditRequirements(data.requirements || []);
+                    }, 100);
+                }
+                break;
+            case 'report':
+                formHTML = `
+        <div class="form-group">
+            <label for="edit-content">Content:</label>
+            <textarea id="edit-content" required>${data.content}</textarea>
+        </div>
+        <button type="submit" class="btn-primary">Update</button>
+        <input type="hidden" id="edit-type" value="${type}">
+        <input type="hidden" id="edit-id" value="${id}">
+    `;
+                break;
+
+            case 'message':
+                formHTML = `
+        <div class="form-group">
+            <label for="edit-content">Content:</label>
+            <textarea id="edit-content" required>${data.content}</textarea>
+        </div>
+        <button type="submit" class="btn-primary">Update</button>
+        <input type="hidden" id="edit-type" value="${type}">
+        <input type="hidden" id="edit-id" value="${id}">
+    `;
+                break;
+
+            case 'role':
+                // Store original data for comparison
+                window.originalRoleData = data;
+                formHTML = `
+        <div class="form-group">
+            <label for="edit-title">Title:</label>
+            <input type="text" id="edit-title" value="${data.title}">
+        </div>
+        <div class="form-group">
+            <label for="edit-abilities">Abilities (comma-separated):</label>
+            <input type="text" id="edit-abilities" value="${Array.isArray(data.abilities) ? data.abilities.join(', ') : data.abilities}">
+        </div>
+        <div class="form-group">
+            <label for="edit-master">Master Role:</label>
+            <select id="edit-master">
+                <option value="">None (Top Level)</option>
+            </select>
+        </div>
+        <button type="submit" class="btn-primary">Update</button>
+        <input type="hidden" id="edit-type" value="${type}">
+        <input type="hidden" id="edit-id" value="${id}">
+    `;
+                break;
+        }
+
+        // formHTML += `
+        //         <button type="submit" class="btn-primary">Update</button>
+        //         <input type="hidden" id="edit-type" value="${type}">
+        //         <input type="hidden" id="edit-id" value="${id}">
+        //     `;
+
+        form.innerHTML = formHTML;
+
+        // If editing role, populate master dropdown
+        if (type === 'role') {
+            await populateRoleDropdown('edit-master', data.master_id);
+        }
+
+        showModal('edit-modal');
+    }
+
+    async function handleEdit(event) {
+        event.preventDefault();
+
+        const type = document.getElementById('edit-type').value;
+        const id = document.getElementById('edit-id').value;
+
+        let endpoint = '';
+        let data = {};
+
+        switch (type) {
+            case 'task':
+                endpoint = `/edit-task/${id}`;
+                data = {
+                    status: document.getElementById('edit-status').value
+                };
+                break;
+
+            case 'task-admin':
+                // Check if task is completed
+                if (window.originalTaskData && window.originalTaskData.status === 'completed') {
+                    showAlert('Cannot edit a completed task', 'error');
+                    closeModal('edit-modal');
+                    return;
+                }
+
+                endpoint = `/edit-task-admin/${id}`;
+                const og = window.originalTaskData;
+                const newName = document.getElementById('edit-name').value;
+                const newDescription = document.getElementById('edit-description').value;
+                const newStatus = document.getElementById('edit-status').value;
+                const newExpires = document.getElementById('edit-expires').value.replace('T', ' ') + ':00';
+                const newRequirements = getEditRequirements();
+
+                data = {};
+
+                if (newName !== og.name) data.name = newName;
+                if (newDescription !== og.description) data.description = newDescription;
+                if (newStatus !== og.status) data.status = newStatus;
+                if (newExpires !== og.expires_at) data.expires_at = newExpires;
+                if (JSON.stringify(newRequirements) !== JSON.stringify(og.requirements || [])) {
+                    data.requirements = newRequirements;
+                }
+
+                // Only send request if something changed
+                if (Object.keys(data).length === 0) {
+                    showAlert('No changes made', 'info');
+                    closeModal('edit-modal');
+                    return;
+                }
+                break;
+
+            case 'report':
+                endpoint = `/edit-report/${id}`;
+                data = {
+                    content: document.getElementById('edit-content').value
+                };
+                break;
+
+            case 'message':
+                endpoint = `/edit-message/${id}`;
+                data = {
+                    content: document.getElementById('edit-content').value
+                };
+                break;
+
+            case 'role':
+                endpoint = `/edit-role/${id}`;
+                const original = window.originalRoleData;
+                const newTitle = document.getElementById('edit-title').value;
+                const newAbilities = document.getElementById('edit-abilities').value.split(',').map(a => a.trim());
+                const newMasterId = document.getElementById('edit-master').value || null;
+
+                data = {};
+
+                if (newTitle !== original.title) {
+                    data.title = newTitle;
+                }
+
+                if (JSON.stringify(newAbilities) !== JSON.stringify(original.abilities)) {
+                    data.abilities = newAbilities;
+                }
+
+                if ((newMasterId || null) !== (original.master_id || null)) {
+                    data.master_id = newMasterId ? parseInt(newMasterId) : null;
+                }
+
+                // Only send request if something changed
+                if (Object.keys(data).length === 0) {
+                    showAlert('No changes made', 'info');
+                    closeModal('edit-modal');
+                    return;
+                }
+                break;
+        }
+
+        const result = await apiFetch(endpoint, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+
+        if (result) {
+            showAlert(`${type} updated successfully!`, 'success');
+            closeModal('edit-modal');
+
+            // Refresh the appropriate section
+            switch (type) {
+                case 'task':
+                    loadTasks();
+                    break;
+                case 'task-admin':
+                    loadTasksAdmin();
+                    break;
+                case 'report':
+                    loadReports();
+                    break;
+                case 'message':
+                    loadMessages();
+                    break;
+                case 'role':
+                    loadRoles();
+                    loadRoleDropdowns();
+                    break;
+            }
+        }
+    }
+
+    // Delete Functions
+    async function deleteItem(type, id) {
+        if (!confirm(`Are you sure you want to delete this ${type}?`)) return;
+
+        let endpoint = '';
+        switch (type) {
+            case 'task':
+                endpoint = `/delete-task/${id}`;
+                break;
+            case 'task-admin':
+                endpoint = `/delete-task-admin/${id}`;
+                break;
+            case 'report':
+                endpoint = `/delete-report/${id}`;
+                break;
+            case 'message':
+                endpoint = `/delete-message/${id}`;
+                break;
+            case 'role':
+                endpoint = `/delete-role/${id}`;
+                break;
+            default:
+                return;
+        }
+
+        const data = await apiFetch(endpoint, {
+            method: 'DELETE'
+        });
+
+        if (data) {
+            showAlert(`${type} deleted successfully!`, 'success');
+
+            // Refresh the appropriate section
+            switch (type) {
+                case 'task':
+                    loadTasks();
+                    break;
+                case 'task-admin':
+                    loadTasksAdmin();
+                    break;
+                case 'report':
+                    loadReports();
+                    break;
+                case 'message':
+                    loadMessages();
+                    break;
+                case 'role':
+                    loadRoles();
+                    break;
+            }
+        }
+    }
+
+    // View Details
+    async function viewDetails(type, id) {
+        let endpoint = '';
+        let title = '';
+
+        switch (type) {
+            case 'task':
+                endpoint = `/task/${id}`;
+                title = 'Task Details';
+                break;
+            case 'task-admin':
+                endpoint = `/task-admin/${id}`;
+                title = 'Task Details';
+                break;
+            case 'report':
+                endpoint = `/report/${id}`;
+                title = 'Report Details';
+                break;
+            case 'report-admin':
+                endpoint = `/report-admin/${id}`;
+                title = 'Report Details';
+                break;
+            case 'message':
+                endpoint = `/message/${id}`;
+                title = 'Message Details';
+                break;
+            case 'user-admin':
+                endpoint = `/user/${id}`;
+                title = 'User Details';
+                break;
+            case 'slave':
+                endpoint = `/slave/${id}`;
+                title = 'User Details';
+                break;
+            case 'role':
+                endpoint = `/role/${id}`;
+                title = 'Role Details';
+                break;
+            default:
+                return;
+        }
+
+        const data = await apiFetch(endpoint);
+        if (!data) return;
+
+        document.getElementById('detail-modal-title').textContent = title;
+
+        let content = '';
+        switch (type) {
+            case 'user-admin':
+            case 'slave':
+                content = formatUserDetails(data);
+                break;
+            case 'role':
+                content = formatRoleDetails(data);
+                break;
+            case 'task':
+            case 'task-admin':
+                content = formatTaskDetails(data);
+                break;
+            case 'report':
+            case 'report-admin':
+                content = formatReportDetails(data);
+                break;
+            case 'message':
+                content = formatMessageDetails(data);
+                break;
+            default:
+                content = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+        }
+
+        document.getElementById('detail-content').innerHTML = content;
+        showModal('detail-modal');
+    }
+
+    // Helper Functions
+    function showAlert(message, type = 'info') {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type}`;
+        alertDiv.textContent = message;
+
+        elements.alertContainer.innerHTML = '';
+        elements.alertContainer.appendChild(alertDiv);
+
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 5000);
+    }
+
+    function showModal(modalId) {
+        document.getElementById(modalId).style.display = 'block';
+
+        // Load dropdowns if needed
+        if (modalId === 'create-task-modal') {
+            // Reset form and set to personal by default
+            document.getElementById('task-type').value = 'personal';
+            toggleTaskForm(); // This sets the correct required attributes
+            loadSlavesForDropdown();
+        } else if (modalId === 'create-message-modal') {
+            loadUsersForMessageDropdown();
+        } else if (modalId === 'create-user-modal') {
+            loadRoleDropdown('user-role');
+        } else if (modalId === 'create-role-modal') {
+            loadRoleDropdown('role-master');
+        }
+    }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+
+    function toggleTaskForm() {
+        const isAdmin = document.getElementById('task-type').value === 'admin';
+        document.getElementById('personal-task-form').classList.toggle('hidden', isAdmin);
+        document.getElementById('admin-task-form').classList.toggle('hidden', !isAdmin);
+
+        // Remove required attributes from hidden form to prevent validation errors
+        if (isAdmin) {
+            // Remove required from personal form
+            const personalInputs = document.querySelectorAll('#personal-task-form [required]');
+            personalInputs.forEach(input => input.removeAttribute('required'));
+            // Add required to admin form
+            const adminRequired = ['task-slave', 'admin-task-name', 'admin-task-description', 'admin-task-expires'];
+            adminRequired.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.setAttribute('required', 'required');
+            });
+        } else {
+            // Remove required from admin form
+            const adminInputs = document.querySelectorAll('#admin-task-form [required]');
+            adminInputs.forEach(input => input.removeAttribute('required'));
+            // Add required to personal form
+            const personalRequired = ['task-name', 'task-description', 'task-expires'];
+            personalRequired.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.setAttribute('required', 'required');
+            });
+        }
+    }
+
+    async function loadSlavesForDropdown() {
+        const data = await apiFetch('/slaves?page=1&limit=100');
+        const select = document.getElementById('task-slave');
+        select.innerHTML = '<option value="">Select a user</option>';
+
+        if (data && data.data) {
+            data.data.forEach(slave => {
+                const option = document.createElement('option');
+                option.value = slave.id;
+                option.textContent = `${slave.name} (${slave.role?.title})`;
+                select.appendChild(option);
+            });
+        }
+    }
+
+    async function loadUsersForMessageDropdown() {
+        const data = await apiFetch('/users-non-manager?page=1&limit=100');
+        const select = document.getElementById('message-receiver');
+        select.innerHTML = '<option value="">Select a user</option>';
+
+        if (data && data.data) {
+            // Filter out current user
+            const currentUsername = localStorage.getItem('username');
+            data.data.forEach(user => {
+                if (user.name !== currentUsername) {
+                    const option = document.createElement('option');
+                    option.value = user.id;
+                    option.textContent = `${user.name} (${user.role?.title || 'No role'})`;
+                    select.appendChild(option);
+                }
+            });
+        }
+    }
+
+    async function loadRoleDropdown(dropdownId, selectedId = null) {
+        const data = await apiFetch('/roles?page=1&limit=100');
+        const select = document.getElementById(dropdownId);
+
+        if (!select) return;
+
+        // Clear all options except the first one
+        const firstOption = select.options[0];
+        select.innerHTML = '';
+        if (firstOption) {
+            select.appendChild(firstOption);
+        }
+
+        if (data && data.data) {
+            data.data.forEach(role => {
+                const option = document.createElement('option');
+                option.value = role.id;
+                option.textContent = `${role.title} (${role.branch})`;
+                if (selectedId && role.id == selectedId) {
+                    option.selected = true;
+                }
+                select.appendChild(option);
+            });
+        }
+    }
+
+    async function populateRoleDropdown(dropdownId, selectedId = null) {
+        await loadRoleDropdown(dropdownId, selectedId);
+    }
+
+    function loadRoleDropdowns() {
+        loadRoleDropdown('role-master');
+        loadRoleDropdown('user-role');
+    }
+
+    function createTaskForSlave(slaveId) {
+        showModal('create-task-modal');
+        document.getElementById('task-type').value = 'admin';
+        toggleTaskForm();
+
+        // Set the slave in dropdown
+        setTimeout(() => {
+            const select = document.getElementById('task-slave');
+            select.value = slaveId;
+        }, 100);
+    }
+
+    async function applyRoleToUser(userId) {
+        const roleId = prompt('Enter Role ID to apply:');
+        if (!roleId) return;
+
+        const data = await apiFetch(`/user-apply-role/${userId}`, {
+            method: 'POST',
+            body: JSON.stringify({role_id: parseInt(roleId)})
+        });
+
+        if (data) {
+            showAlert('Role applied successfully!', 'success');
+            loadUsers();
+        }
+    }
+
+    function setupPagination(paginationInfo, section) {
+        // Simple pagination implementation
+        const paginationDiv = document.createElement('div');
+        paginationDiv.className = 'pagination';
+
+        if (paginationInfo.has_previous_page) {
+            const prevBtn = document.createElement('button');
+            prevBtn.textContent = '← Previous';
+            prevBtn.className = 'page-btn';
+            prevBtn.onclick = () => {
+                currentPage = paginationInfo.previous_page;
+                loadSection(section);
+            };
+            paginationDiv.appendChild(prevBtn);
+        }
+
+        const pageInfo = document.createElement('span');
+        pageInfo.textContent = `Page ${paginationInfo.current_page} of ${paginationInfo.total_pages}`;
+        pageInfo.style.margin = '0 1rem';
+        paginationDiv.appendChild(pageInfo);
+
+        if (paginationInfo.has_next_page) {
+            const nextBtn = document.createElement('button');
+            nextBtn.textContent = 'Next →';
+            nextBtn.className = 'page-btn';
+            nextBtn.onclick = () => {
+                currentPage = paginationInfo.next_page;
+                loadSection(section);
+            };
+            paginationDiv.appendChild(nextBtn);
+        }
+
+        // Add to container
+        const container = document.getElementById(`${section}-container`);
+        container.appendChild(paginationDiv);
+    }
+
+    function loadSection(section) {
+        switch (section) {
+            case 'tasks':
+                loadTasks();
+                break;
+            case 'tasks-admin':
+                loadTasksAdmin();
+                break;
+            case 'reports':
+                loadReports();
+                break;
+            case 'reports-admin':
+                loadReportsAdmin();
+                break;
+            case 'messages':
+                loadMessages();
+                break;
+            case 'users':
+                loadUsers();
+                break;
+            case 'slaves':
+                loadSlaves();
+                break;
+            case 'roles':
+                loadRoles();
+                break;
+        }
+    }
+
+    // Close modals when clicking outside
+    window.onclick = function (event) {
+        const modals = document.getElementsByClassName('modal');
+        for (let modal of modals) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    };
+
+    // Initialize form toggles
+    toggleLoginForm();
+
+    function formatUserDetails(user) {
+        return `
+        <div>
+            <p><strong>ID:</strong> ${user.id}</p>
+            <p><strong>Username:</strong> ${user.name}</p>
+            <p><strong>Role:</strong> ${user.role?.title || 'N/A'}</p>
+            <p><strong>Role Branch:</strong> ${user.role?.branch || 'N/A'}</p>
+            <p><strong>Role Depth:</strong> ${user.role?.depth || '0'}</p>
+            <p><strong>Created At:</strong> ${new Date(user.created_at).toLocaleString()}</p>
+            <p><strong>Updated At:</strong> ${new Date(user.updated_at).toLocaleString()}</p>
+            <h4>Abilities:</h4>
+            <ul>
+                ${(Array.isArray(user.role?.abilities) ? user.role.abilities.map(a => `<li>${a}</li>`) : ['<li>None</li>']).join('')}
+            </ul>
+            <h4>Tasks (${user.tasks?.length || 0}):</h4>
+            ${user.tasks && user.tasks.length > 0 ?
+            `<ul>${user.tasks.map(task => `<li>${task.name} - ${task.status}</li>`).join('')}</ul>` :
+            '<p>No tasks</p>'}
+            <h4>Reports (${user.reports?.length || 0}):</h4>
+            ${user.reports && user.reports.length > 0 ?
+            `<ul>${user.reports.map(report => `<li>${report.content.substring(0, 50)}...</li>`).join('')}</ul>` :
+            '<p>No reports</p>'}
+        </div>
+    `;
+    }
+
+    function formatRoleDetails(role) {
+        return `
+        <div>
+            <p><strong>ID:</strong> ${role.id}</p>
+            <p><strong>Title:</strong> ${role.title}</p>
+            <p><strong>Branch:</strong> ${role.branch}</p>
+            <p><strong>Depth:</strong> ${role.depth}</p>
+            <p><strong>Master Role:</strong> ${role.master?.title || 'None (Top Level)'}</p>
+            <p><strong>Created At:</strong> ${new Date(role.created_at).toLocaleString()}</p>
+            <p><strong>Updated At:</strong> ${new Date(role.updated_at).toLocaleString()}</p>
+            <h4>Abilities:</h4>
+            <ul>
+                ${Array.isArray(role.abilities) ? role.abilities.map(a => `<li>${a}</li>`).join('') : '<li>None</li>'}
+            </ul>
+            <h4>Slave Roles (${role.slaves?.length || 0}):</h4>
+            ${role.slaves && role.slaves.length > 0 ?
+            `<ul>${role.slaves.map(slave => `<li>${slave.title}</li>`).join('')}</ul>` :
+            '<p>No slave roles</p>'}
+        </div>
+    `;
+    }
+
+    function formatTaskDetails(task) {
+        const statusClass = task.status === 'completed' ? 'status-completed' :
+            task.status === 'failed' ? 'status-failed' : 'status-pending';
+
+        return `
+        <div>
+            <p><strong>ID:</strong> ${task.id}</p>
+            <p><strong>Name:</strong> ${task.name}</p>
+            <p><strong>Description:</strong> ${task.description}</p>
+            <p><strong>Status:</strong> <span class="status-badge ${statusClass}">${task.status}</span></p>
+            <p><strong>Expires At:</strong> ${new Date(task.expires_at).toLocaleString()}</p>
+            <p><strong>Created At:</strong> ${new Date(task.created_at).toLocaleString()}</p>
+            <p><strong>Updated At:</strong> ${new Date(task.updated_at).toLocaleString()}</p>
+            <p><strong>Assigned To:</strong> ${task.tasked?.name || 'Self'}</p>
+            ${task.tasker ? `<p><strong>Assigned By:</strong> ${task.tasker.name}</p>` : ''}
+            ${task.requirements && task.requirements.length > 0 ? `
+                <h4>Requirements:</h4>
+                <ul class="requirements-list">
+                    ${task.requirements.map(req => `<li><strong>${req.field}:</strong> ${req.value}</li>`).join('')}
+                </ul>
+            ` : ''}
+        </div>
+    `;
+    }
+
+    function formatReportDetails(report) {
+        return `
+        <div>
+            <p><strong>ID:</strong> ${report.id}</p>
+            <p><strong>Content:</strong> ${report.content}</p>
+            <p><strong>User:</strong> ${report.user?.name || 'Unknown'}</p>
+            <p><strong>Created At:</strong> ${new Date(report.created_at).toLocaleString()}</p>
+            <p><strong>Updated At:</strong> ${new Date(report.updated_at).toLocaleString()}</p>
+        </div>
+    `;
+    }
+
+    function formatMessageDetails(message) {
+        return `
+        <div>
+            <p><strong>ID:</strong> ${message.id}</p>
+            <p><strong>Content:</strong> ${message.content}</p>
+            <p><strong>From:</strong> ${message.sender?.name || 'Unknown'}</p>
+            <p><strong>To:</strong> ${message.receiver?.name || 'Unknown'}</p>
+            <p><strong>Sent At:</strong> ${new Date(message.created_at).toLocaleString()}</p>
+            <p><strong>Last Updated:</strong> ${new Date(message.updated_at).toLocaleString()}</p>
+        </div>
+    `;
+    }
+
+    function buildUserDashboard() {
+        elements.dashboard.innerHTML = `
+        <h2>Dashboard</h2>
+        <div class="card">
+            <h3>Quick Actions</h3>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
+                <button onclick="showModal('create-task-modal')" class="btn-primary">Create Task</button>
+                <button onclick="showModal('create-report-modal')" class="btn-success">Create Report</button>
+                <button onclick="showModal('create-message-modal')" class="btn-secondary">Send Message</button>
+                <button onclick="loadTasks()" class="btn-secondary">Refresh Tasks</button>
+                <button onclick="loadReports()" class="btn-secondary">Refresh Reports</button>
+            </div>
+        </div>
+    `;
+    }
+
+    async function loadCurrentUser() {
+        if (userType === 'user') {
+            // First try to get current user from a new endpoint
+            const data = await apiFetch('/users-non-manager?page=1&limit=100');
+            if (data && data.data) {
+                // Find current user by matching with stored username
+                const username = localStorage.getItem('username');
+                currentUser = data.data.find(user => user.name === username);
+                if (currentUser) {
+                    updateUserInfo();
+                    return;
+                }
+            }
+            // Fallback to slaves endpoint for user info
+            const slavesData = await apiFetch('/slaves?page=1&limit=1');
+            if (slavesData && slavesData.data.length > 0) {
+                // This should be the current user if they have slaves
+                currentUser = slavesData.data[0];
+                updateUserInfo();
+            }
+        } else if (userType === 'manager') {
+            // Hide user info for managers
+            elements.userInfo.classList.add('hidden');
+        }
+    }
+
+    function addRequirementRow(field = '', value = '') {
+        const container = document.getElementById('requirements-container');
+        const row = document.createElement('div');
+        row.className = 'requirement-row';
+        row.style = 'display: flex; gap: 0.5rem; margin-bottom: 0.5rem;';
+        row.innerHTML = `
+        <input type="text" class="requirement-field" placeholder="Field name" value="${field}" style="flex: 1;">
+        <input type="text" class="requirement-value" placeholder="Value" value="${value}" style="flex: 1;">
+        <button type="button" onclick="removeRequirementRow(this)" class="btn-danger">×</button>
+    `;
+        container.appendChild(row);
+    }
+
+    function removeRequirementRow(button) {
+        const row = button.closest('.requirement-row');
+        if (row) {
+            row.remove();
+        }
+    }
+
+    function getRequirements() {
+        const rows = document.querySelectorAll('.requirement-row');
+        const requirements = [];
+        rows.forEach(row => {
+            const field = row.querySelector('.requirement-field').value.trim();
+            const value = row.querySelector('.requirement-value').value.trim();
+            if (field && value) {
+                requirements.push({field, value});
+            }
+        });
+        return requirements;
+    }
+
+    function addEditRequirementRow(field = '', value = '') {
+        const container = document.getElementById('edit-requirements-container');
+        const row = document.createElement('div');
+        row.className = 'edit-requirement-row';
+        row.style = 'display: flex; gap: 0.5rem; margin-bottom: 0.5rem;';
+        row.innerHTML = `
+        <input type="text" class="edit-requirement-field" placeholder="Field name" value="${field}" style="flex: 1;">
+        <input type="text" class="edit-requirement-value" placeholder="Value" value="${value}" style="flex: 1;">
+        <button type="button" onclick="removeEditRequirementRow(this)" class="btn-danger">×</button>
+    `;
+        container.appendChild(row);
+    }
+
+    function removeEditRequirementRow(button) {
+        const row = button.closest('.edit-requirement-row');
+        if (row) {
+            row.remove();
+        }
+    }
+
+    function populateEditRequirements(requirements) {
+        const container = document.getElementById('edit-requirements-container');
+        container.innerHTML = '';
+        if (requirements && requirements.length > 0) {
+            requirements.forEach(req => {
+                addEditRequirementRow(req.field, req.value);
+            });
+        } else {
+            addEditRequirementRow();
+        }
+    }
+
+    function getEditRequirements() {
+        const rows = document.querySelectorAll('.edit-requirement-row');
+        const requirements = [];
+        rows.forEach(row => {
+            const field = row.querySelector('.edit-requirement-field').value.trim();
+            const value = row.querySelector('.edit-requirement-value').value.trim();
+            if (field && value) {
+                requirements.push({field, value});
+            }
+        });
+        return requirements;
+    }
+</script>
+</body>
+</html>
