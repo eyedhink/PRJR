@@ -1440,6 +1440,7 @@ window.onclick = function (event) {
 toggleLoginForm();
 
 function formatUserDetails(user) {
+    console.log(user.role.slaves) // map this to get the users;
     return `
         <div>
             <p><strong>ID:</strong> ${user.id}</p>
@@ -1452,6 +1453,12 @@ function formatUserDetails(user) {
             <h4>Abilities:</h4>
             <ul>
                 ${(Array.isArray(user.role?.abilities) ? user.role.abilities.map(a => `<li>${a}</li>`) : ['<li>None</li>']).join('')}
+            </ul>
+            <h4>Underlings:</h4>
+            <ul>
+            ${(Array.isArray(user.role?.slaves) ? (
+        user.role.slaves.map(slave => (slave.users.map(user => `<li>${user.name}</li>`)))
+    ) : ['<li>None</li>']).join('')}
             </ul>
             <h4>Tasks (${user.tasks?.length || 0}):</h4>
             ${user.tasks && user.tasks.length > 0 ?
@@ -1475,6 +1482,10 @@ function formatRoleDetails(role) {
             <p><strong>Master Role:</strong> ${role.master?.title || 'None (Top Level)'}</p>
             <p><strong>Created At:</strong> ${new Date(role.created_at).toLocaleString()}</p>
             <p><strong>Updated At:</strong> ${new Date(role.updated_at).toLocaleString()}</p>
+            <h4>Users:</h4>
+            <ul>
+                ${Array.isArray(role.users) ? role.users.map(a => `<li>#${a.id} : ${a.name}</li>`).join('') : '<li>None</li>'}
+            </ul>
             <h4>Abilities:</h4>
             <ul>
                 ${Array.isArray(role.abilities) ? role.abilities.map(a => `<li>${a}</li>`).join('') : '<li>None</li>'}
